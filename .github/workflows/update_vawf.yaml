@@ -20,7 +20,7 @@ jobs:
         
     - name: Run feature detection algorithms
       run: |
-        cd stormtracker
+        cd vawf
         source make_vawf.sh
         
     - name: Checkout destination repository
