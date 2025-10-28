@@ -1,0 +1,44 @@
+# .github/workflows/update_vawf.yaml
+name: Update Value Added Weather Forecasts
+
+on:
+  schedule:
+    - cron: '0 10 * * *'  # Runs daily at 10 AM UTC
+  workflow_dispatch:  # Manually triggered
+
+jobs:
+  copy-file:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source repository
+      uses: actions/checkout@v3
+      with:
+        repository: nbarjun/vawf
+        token: ${{ secrets.STORM_TOKEN }}
+        path: vawf
+        
+    - name: Run feature detection algorithms
+      run: |
+        cd stormtracker
+        source make_vawf.sh
+        
+    - name: Checkout destination repository
+      uses: actions/checkout@v3
+      with:
+        repository: nbarjun/nbarjun.github.io
+        token: ${{ secrets.STORM_TOKEN }}
+        path: nbarjun.github.io
+
+    - name: Copy file
+      run: |
+        cp vawf/outputs/* nbarjun.github.io/files/vawf/outputs/
+
+    - name: Commit and push to destination
+      run: |
+        cd nbarjun.github.io
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git add files/vawf/outputs/*
+        git commit -m "Updated VAWF"
+        git push

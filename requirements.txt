@@ -1,0 +1,13 @@
+cfgrib==0.9.15.1
+cmcrameri==1.9
+ecmwf_opendata==0.3.24
+geopy==2.4.1
+matplotlib==3.10.7
+metpy==1.7.1
+numpy==2.3.4
+pandas==2.3.3
+Pillow==12.0.0
+scipy==1.16.2
+skimage==0.0
+tqdm==4.67.1
+xarray==2025.10.1

@@ -6,7 +6,6 @@ import metpy as metpy
 from skimage.morphology import remove_small_holes
 from skimage.segmentation import find_boundaries
 import matplotlib.pyplot as plt
-import cartopy.crs as ccrs
 import matplotlib.gridspec as gridspec
 from scipy.interpolate import NearestNDInterpolator as nn_interp
 import metpy.calc as mpcalc
@@ -119,51 +118,7 @@ class object_properties2D:
                         coords={'lat':(['lat'],grid_area.lat.values),
                          'lon':(['lon'],grid_area.lon.values)})
         return sigmas
-
-    def plot_properties(self,option):
-        if option == 'grid':
-            fig,ax = plt.subplots(1,3,figsize=(12,5),dpi=100,subplot_kw={'projection': \
-                                        ccrs.EckertIII(central_longitude=0.0)})
-            properties=['xdistance','ydistance','grid_area']
-
-            for a,p in zip(ax,properties):
-                if p == 'grid_area':
-                    self.grid[p]['cell_area'].plot(ax=a,transform=ccrs.PlateCarree(),\
-                                    cbar_kwargs={'shrink':.25,'aspect':15})
-                else:
-                    self.grid[p].plot(ax=a,transform=ccrs.PlateCarree(),\
-                                          cbar_kwargs={'shrink':.25,'aspect':15,'format':'%.1e'})
-
-                a.coastlines()
-                a.gridlines(linestyle='--',alpha=0.4)
-                a.set_title(p)
-        elif option == 'smooth':
-            fig,ax = plt.subplots(1,2,figsize=(12,5),dpi=100,subplot_kw={'projection': \
-                                    ccrs.EckertIII(central_longitude=0.0)})
-            properties=['sigma_lon','sigma_lat']
-            for a,p in zip(ax,properties):
-                self.smooth[p].plot(ax=a,transform=ccrs.PlateCarree(),\
-                    cbar_kwargs={'shrink':.25,'aspect':15,'label':r'$\sigma$'})
-                a.coastlines()
-                a.gridlines(linestyle='--',alpha=0.4)
-                a.set_title(p)
-                
-        elif option == 'land':
-            fig,ax = plt.subplots(1,3,figsize=(12,5),dpi=100,subplot_kw={'projection': \
-                                        ccrs.EckertIII(central_longitude=0.0)})
-            properties=['islnd','coastlines','orientation']
-            cmaps = ['binary','binary','hsv']
-            for a,p,c in zip(ax,properties,cmaps):
-                c=self.land[p].plot(ax=a,transform=ccrs.PlateCarree(),cmap=c,\
-                    add_colorbar=False)
-                a.gridlines(linestyle='--',alpha=0.4)
-                a.set_title(p)
-            cb_pos = ax[-1].get_position()
-            pos_cax= fig.add_axes([cb_pos.x0+cb_pos.width+0.01,cb_pos.y0,\
-                                   cb_pos.width/30,cb_pos.height])
-            cb=plt.colorbar(c, cax=pos_cax, orientation='vertical')
-            cb.set_label(r'$degree$')
-                
+    
     def print_properties(self):        
         obj_value_unit = ['m','degree',\
                           'unitless','m',r'm$^2$', 'counts','m',\
