@@ -15,7 +15,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         repository: nbarjun/vawf
-        token: ${{ secrets.STORM_TOKEN }}
+        token: ${{ secrets.VAWF_TOKEN }}
         path: vawf
         
     - name: Run feature detection algorithms
@@ -27,7 +27,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         repository: nbarjun/nbarjun.github.io
-        token: ${{ secrets.STORM_TOKEN }}
+        token: ${{ secrets.VAWF_TOKEN }}
         path: nbarjun.github.io
 
     - name: Copy file
