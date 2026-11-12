@@ -41,6 +41,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: nbarjun/nbarjun.github.io
+          ref: gh-pages
           token: ${{ secrets.VAWF_TOKEN }}
           path: nbarjun.github.io
 
