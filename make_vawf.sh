@@ -1,7 +1,8 @@
-# pip install -r requirements.txt
+#!/usr/bin/env bash
+set -e
+
+if [ -f ".venv/bin/activate" ]; then
+  source .venv/bin/activate
+fi
+
 python vawf_workflow.py
-git config user.name "github-actions"
-git config user.email "github-actions@github.com"
-git add outputs
-git commit -m "Updated VAWF"
-git push
