@@ -45,8 +45,9 @@ jobs:
         path: nbarjun.github.io
 
     - name: Copy file
+      working-directory: vawf
       run: |
-        cp vawf/outputs/* nbarjun.github.io/assets/vawf/outputs/
+        cp outputs/* nbarjun.github.io/assets/vawf/outputs/
 
     - name: Commit and push to destination
       working-directory: nbarjun.github.io
