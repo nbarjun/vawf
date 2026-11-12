@@ -1,62 +1,66 @@
-# .github/workflows/update_vawf.yaml
 name: Update Value Added Weather Forecasts
 
 on:
   schedule:
     - cron: '0 10 * * *'  # Runs daily at 10 AM UTC
-  workflow_dispatch:  # Manually triggered
+  workflow_dispatch:      # Manually triggered
+
+concurrency:
+  group: update-vawf
+  cancel-in-progress: false
 
 jobs:
   copy-file:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout source repository
-      uses: actions/checkout@v4
-      with:
-        repository: nbarjun/vawf
-        token: ${{ secrets.VAWF_TOKEN }}
-        path: vawf
+      - name: Checkout source repository
+        uses: actions/checkout@v4
+        with:
+          repository: nbarjun/vawf
+          token: ${{ secrets.VAWF_TOKEN }}
+          path: vawf
 
-    # Cache uv packages
-    - name: Set up uv and Python 3.12 with caching
-      uses: astral-sh/setup-uv@v5
-      with:
-        python-version: "3.12"
-        enable-cache: true
-        cache-dependency-glob: "vawf/requirements.txt"
-          
-    - name: Install dependencies
-      working-directory: vawf
-      run: |
-        uv venv
-        uv pip install -r requirements.txt
+      - name: Set up uv and Python 3.12 with caching
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: "vawf/requirements.txt"
 
-    - name: Run feature detection algorithms
-      working-directory: vawf
-      run: |
-        bash make_vawf.sh
-        
-    - name: Checkout destination repository
-      uses: actions/checkout@v3
-      with:
-        repository: nbarjun/nbarjun.github.io
-        token: ${{ secrets.VAWF_TOKEN }}
-        path: nbarjun.github.io
+      - name: Install dependencies
+        working-directory: vawf
+        run: |
+          uv venv
+          uv pip install -r requirements.txt
 
-    - name: Copy file
-      working-directory: vawf
-      run: |
-        cp outputs/* nbarjun.github.io/assets/vawf/outputs/
+      - name: Run feature detection algorithms
+        working-directory: vawf
+        run: |
+          bash make_vawf.sh
 
-    - name: Commit and push to destination
-      working-directory: nbarjun.github.io
-      run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions@github.com"
-        git add files/vawf/outputs/*
-        if ! git diff --cached --quiet; then
-          git commit -m "Updated VAWF"
-          git pull --rebase -X theirs origin main
-          git push origin main
-        fi
+      - name: Checkout destination repository
+        uses: actions/checkout@v4
+        with:
+          repository: nbarjun/nbarjun.github.io
+          token: ${{ secrets.VAWF_TOKEN }}
+          path: nbarjun.github.io
+
+      - name: Copy file
+        run: |
+          mkdir -p nbarjun.github.io/assets/vawf/outputs/
+          cp vawf/outputs/* nbarjun.github.io/assets/vawf/outputs/
+
+      - name: Commit and push to destination
+        working-directory: nbarjun.github.io
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add assets/vawf/outputs/
+          if ! git diff --cached --quiet; then
+            git commit -m "Updated VAWF"
+            git pull --rebase -X theirs
+            git push
+          else
+            echo "No output changes to commit."
+          fi
