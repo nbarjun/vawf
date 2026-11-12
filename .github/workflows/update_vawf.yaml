@@ -18,14 +18,13 @@ jobs:
         token: ${{ secrets.VAWF_TOKEN }}
         path: vawf
 
-    # Cache pip packages
-    - name: Cache pip
-      uses: actions/cache@v4
+    # Cache uv packages
+    - name: Set up uv and Python 3.12 with caching
+      uses: astral-sh/setup-uv@v5
       with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
+        python-version: "3.12"
+        enable-cache: true
+        cache-dependency-glob: "vawf/requirements.txt"
           
     - name: Install dependencies
       run: |
